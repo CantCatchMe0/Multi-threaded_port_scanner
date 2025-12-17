@@ -12,6 +12,7 @@ init(autoreset=True)
 print_lock = threading.Lock()
 
 def main():
+    # setting up argument for terminal to use
     parser = argparse.ArgumentParser(description="Python multi-threaded_port_scanner v1.0")
     parser.add_argument("target", help = "target IP, host name or url")
     parser.add_argument("-p", "--ports", default="1-1000", help = "scan range, default 1-1000")
@@ -28,6 +29,7 @@ def main():
         sys.exit()  
       
     try:
+        # match the start port and end port from the input arguments
         start_port, end_port = map(int, args.ports.split('-'))
         port_list = range(start_port, end_port + 1)
     except ValueError:
@@ -36,7 +38,8 @@ def main():
     
     print(f"{Fore.CYAN}[*] Start scanning {len(port_list)} ports, using {args.threads} of threads...")
     start_time = datetime.now()
-
+    # use multithreading and assign job to each thread
+    # inform each executor what method they need to use and what parameter for that method
     with ThreadPoolExecutor(max_workers=args.threads) as executor:
         for port in port_list:
             executor.submit(scan_port, target_ip, port)
@@ -85,7 +88,7 @@ def get_banner(ip, port):
             s.send(b'HEAD / HTTP/1.0 \r\n\r\n')
         except:
             pass
-
+            
         banner = s.recv(1024).decode().strip()
         s.close()
         return banner
